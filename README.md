@@ -48,12 +48,12 @@ Link, not just the referral landing.
 
 | URL | App installed | App not installed |
 |---|---|---|
-| `…/breath-site` | Opens the app, no code redeemed | Page redirects to the App Store |
-| `…/breath-site?ref=ABC234` | Opens the app, `ABC234` redeemed | Page shows the code + Copy button |
-| `…/breath-site?ref=abc234` | Opens the app, redeemed (parser upcases) | Page shows `ABC234` |
-| `…/breath-site?ref=OOPS` | Opens the app, nothing redeemed | Page redirects — wrong length |
-| `…/breath-site?ref=ABC0I1` | Opens the app, nothing redeemed | Page redirects — `0`, `I`, `1` are not in the alphabet |
-| `…/breath-site/privacy/` | Opens the app, nothing redeemed | Renders the privacy policy |
+| `https://geekingwithmauri.com/breath-site` | Opens the app, no code redeemed | Page redirects to the App Store |
+| `https://geekingwithmauri.com/breath-site?ref=ABC234` | Opens the app, `ABC234` redeemed | Page shows the code + Copy button |
+| `https://geekingwithmauri.com/breath-site?ref=abc234` | Opens the app, redeemed (parser upcases) | Page shows `ABC234` |
+| `https://geekingwithmauri.com/breath-site?ref=OOPS` | Opens the app, nothing redeemed | Page redirects — wrong length |
+| `https://geekingwithmauri.com/breath-site?ref=ABC0I1` | Opens the app, nothing redeemed | Page redirects — `0`, `I`, `1` are not in the alphabet |
+| `https://geekingwithmauri.com/breath-site/privacy/` | Opens the app, nothing redeemed | Renders the privacy policy |
 
 The last row is the one that surprises people: the App Store privacy link is inside
 the AASA scope, so on a device with Breath installed it opens the app instead of the
