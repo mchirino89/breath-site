@@ -41,6 +41,38 @@ behaviour, unchanged. Validation is client-side and deliberate: 6 chars from
 JS-only; a `<meta refresh>` in `<head>` would fire before the script could cancel it
 on the referral path.
 
+## Universal Link examples
+
+The AASA pattern is `/breath-site*`, so **every** path in this repo is a Universal
+Link, not just the referral landing.
+
+| URL | App installed | App not installed |
+|---|---|---|
+| `…/breath-site` | Opens the app, no code redeemed | Page redirects to the App Store |
+| `…/breath-site?ref=ABC234` | Opens the app, `ABC234` redeemed | Page shows the code + Copy button |
+| `…/breath-site?ref=abc234` | Opens the app, redeemed (parser upcases) | Page shows `ABC234` |
+| `…/breath-site?ref=OOPS` | Opens the app, nothing redeemed | Page redirects — wrong length |
+| `…/breath-site?ref=ABC0I1` | Opens the app, nothing redeemed | Page redirects — `0`, `I`, `1` are not in the alphabet |
+| `…/breath-site/privacy/` | Opens the app, nothing redeemed | Renders the privacy policy |
+
+The last row is the one that surprises people: the App Store privacy link is inside
+the AASA scope, so on a device with Breath installed it opens the app instead of the
+page. Harmless — `ShareInvite.code(fromIncoming:)` finds no `?ref=` and returns nil,
+so the app just launches to home — but narrow the AASA `components` if that ever
+needs to stop.
+
+Codes are 6 chars from `ReferralCode.alphabet`, which omits `0`, `O`, `1`, `I` so a
+code read aloud or off a screen can't be mistyped. Both sides validate independently:
+`index.html` sanitizes before rendering, and `ReferralCode(parsing:)` re-checks in the
+app. Neither trusts the other.
+
+To test a link end to end, `curl` the AASA first (see below), then tap a real link on
+a real device — the simulator won't do it:
+
+```bash
+curl -sS https://geekingwithmauri.com/.well-known/apple-app-site-association
+```
+
 ## The AASA file is not in this repo
 
 Universal Links require `apple-app-site-association` at the **domain root**
