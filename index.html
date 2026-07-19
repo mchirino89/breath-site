@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Breath — One Minute</title>
+<title data-i18n="landingTitle">Breath — One Minute</title>
 <link rel="canonical" href="https://apps.apple.com/app/id6791719844">
 <style>
   :root { color-scheme: light dark; }
@@ -40,18 +40,21 @@
 </head>
 <body>
   <h1>Breath</h1>
-  <p>One minute. That's the whole app.</p>
+  <p data-i18n="tagline">One minute. That's the whole app.</p>
 
   <div id="referral">
-    <p>Your friend sent you an invite code — copy it, install Breath, and paste it on first launch.</p>
+    <p data-i18n="invite">Your friend sent you an invite code — copy it, install Breath, and paste it on first launch.</p>
     <div id="code"></div>
-    <button class="button" id="copy" type="button">Copy code</button>
-    <a class="button secondary" href="https://apps.apple.com/app/id6791719844">Get Breath</a>
+    <button class="button" id="copy" type="button" data-i18n="copy">Copy code</button>
+    <a class="button secondary" href="https://apps.apple.com/app/id6791719844" data-i18n="get">Get Breath</a>
   </div>
 
-  <p id="fallback">Taking you to the App Store…<br>
+  <p id="fallback" data-i18n="fallback">Taking you to the App Store…<br>
     <a href="https://apps.apple.com/app/id6791719844">Open in the App Store</a></p>
 
+  <!-- Before the script below, so the referral card is translated while it is still
+       display:none and the swap is never visible as a repaint. -->
+  <script src="/breath-site/i18n.js"></script>
   <script>
     // Sanitize before rendering: the raw query param never touches the DOM.
     // Valid codes are exactly 6 chars from the app's unambiguous alphabet.
@@ -66,9 +69,9 @@
       var copy = document.getElementById("copy");
       copy.addEventListener("click", function () {
         navigator.clipboard.writeText(code).then(function () {
-          copy.textContent = "Copied ✓";
+          copy.textContent = t("copied", "Copied ✓");
         }, function () {
-          copy.textContent = "Copy failed — long-press the code instead";
+          copy.textContent = t("copyFail", "Copy failed — long-press the code instead");
         });
       });
     } else {

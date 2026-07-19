@@ -41,6 +41,46 @@ behaviour, unchanged. Validation is client-side and deliberate: 6 chars from
 JS-only; a `<meta refresh>` in `<head>` would fire before the script could cancel it
 on the referral path.
 
+## Languages
+
+The landing and support pages ship English in the markup; `i18n.js` applies Spanish
+over it at load. JS-off, a crawler, or a broken script all yield the English page
+rather than a blank one.
+
+| Browser locale | Result |
+|---|---|
+| anything non-`es` | English |
+| `es`, `es-419`, `es-MX`, `es-CL`, … | Neutral Latin American Spanish, tuteo, "Configuración" |
+| `es-AR`, `es-UY`, `es-PY` | Rioplatense voseo — `instalá`, `tocá`, `cancelás` |
+| `es-ES` | Neutral tuteo, but "Ajustes" — Apple's own term in Spain |
+
+`es-CL` deliberately takes the neutral base: Chilean voseo is informal-register and
+doesn't belong in UI copy. Spain gets an overlay for essentially one word, because the
+support page is step-by-step navigation through the iOS Settings app and Apple names it
+differently there — wrong term, and the instructions point at a menu the user doesn't
+have.
+
+`/privacy/` and `/terms/` stay English. Two versions of a legal document raise "which
+one governs?", so the Spanish support page says outright that they're in English rather
+than dropping someone into a wall of it unannounced.
+
+Add `?lang=es-AR` (or `es`, `es-ES`, `en`) to any URL to force a variant — the only way
+to check all four without changing your phone's settings. There is no visible language
+toggle; the landing page is five lines of text and a button, and a picker would be the
+third-most prominent thing on it.
+
+Overlays in `i18n.js` are **sparse**: a key absent from `ES_AR` means the base is
+already correct, not that nobody translated it. `node --test` enforces that — including
+the case that otherwise fails silently forever, an overlay key misspelled so it matches
+nothing.
+
+Voice follows the app's String Catalog: tú throughout, `alguien` rather than `tu amigo`,
+and strings the app already ships (`Restaurar compras`, `Política de privacidad`,
+`Términos de uso`) reused verbatim. The site naming a button differently than the app
+labels it is worse than not translating at all.
+
+Full rationale: [`docs/plans/2026-07-19-breathsite-localization-design.md`](docs/plans/2026-07-19-breathsite-localization-design.md).
+
 ## Universal Link examples
 
 The AASA pattern is `/breath-site*`, so **every** path in this repo is a Universal
@@ -93,6 +133,21 @@ verified by curl plus one manual tap on a real device.
 Plain HTML, no build step. `.nojekyll` disables GitHub's Jekyll processing.
 Push to `main` and Pages redeploys.
 
+Translations live in `i18n.js`. After touching them:
+
+```bash
+node --test        # key parity + locale resolution, no package.json, no dependencies
+```
+
+To view it as served (the pages load `i18n.js` by absolute path, so opening
+`index.html` from disk won't find it):
+
+```bash
+ln -sfn "$PWD" /tmp/breath-site
+python3 -m http.server 8731 --directory /tmp
+# then http://localhost:8731/breath-site/?ref=ABC234&lang=es-AR
+```
+
 ## Careful
 
 Changing this repo's name or the page paths breaks three live things at once:
@@ -103,3 +158,6 @@ the App Store privacy URL, every referral link already shared, and the AASA
 - `ShareInvite.baseURL` (`BreathCore/Sources/BreathCore/Referrals/ShareInvite.swift`)
 - `LegalURL` (`Breath/Subscriptions/PaywallView.swift`)
 - `.well-known/apple-app-site-association` (blog repo)
+- the `<script src="/breath-site/i18n.js">` tags and the `/breath-site/` links inside
+  `i18n.js`'s `legal` string — absolute paths, so a rename silently un-localizes both
+  pages rather than erroring
